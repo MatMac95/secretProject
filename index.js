@@ -13,16 +13,27 @@ import express from "express";
 
 const app = express();
 const port = 3000;
+let userIsAuth = false;
+const password = "ILovePizza";
 
 //calling bodyparser middleware before request handlers
 app.use(bodyParser.urlencoded({ extended: true }));
+
+const passwordCheck = (req, res, next) => {
+  const inputPassword = req.body["password"];
+  if (inputPassword === password) {
+    userIsAuth = true;
+  }
+  next();
+};
+app.use(passwordCheck);
 
 //request handlers
 app.get("/", (req, res) => {
   res.sendFile(__dirname + "/public/index.html");
 });
 app.post("/check", (req, res) => {
-  if (req.body.password === "ILovePizza") {
+  if (userIsAuth) {
     res.sendFile(__dirname + "/public/secret.html");
   } else {
     res.redirect("/");
